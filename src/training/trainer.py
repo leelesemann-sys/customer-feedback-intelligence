@@ -126,6 +126,130 @@ def train_and_evaluate(
     return all_results
 
 
+def train_multi_seed(
+    model_factory,
+    dataset_loader,
+    seeds: list[int],
+    dataset_name: str = "german",
+    max_train_samples: int | None = None,
+) -> dict[str, Any]:
+    """Train a model across multiple seeds and aggregate metrics.
+
+    Args:
+        model_factory: Callable that returns a fresh SentimentModel instance.
+        dataset_loader: Callable(seed) → dict with 'train', 'val', 'test' splits.
+        seeds: List of random seeds to use.
+        dataset_name: Name for logging.
+        max_train_samples: Cap on training samples.
+
+    Returns:
+        Dict with per-seed results, mean, and std for key metrics.
+    """
+    from src.data.preprocessor import TextPreprocessor
+
+    preprocessor = TextPreprocessor()
+    all_runs = []
+
+    for seed in seeds:
+        logger.info("=" * 50)
+        logger.info("Seed %d / %d: %d", seeds.index(seed) + 1, len(seeds), seed)
+        logger.info("=" * 50)
+
+        splits = dataset_loader(seed=seed)
+        for split_name in splits:
+            splits[split_name] = preprocessor.preprocess_dataframe(splits[split_name])
+
+        model = model_factory()
+        result = train_and_evaluate(
+            model=model,
+            train_texts=splits["train"]["text_clean"].tolist(),
+            train_labels=splits["train"]["label"].tolist(),
+            val_texts=splits["val"]["text_clean"].tolist(),
+            val_labels=splits["val"]["label"].tolist(),
+            test_texts=splits["test"]["text_clean"].tolist(),
+            test_labels=splits["test"]["label"].tolist(),
+            log_to_mlflow=False,
+            save_model=False,
+            extra_params={"seed": seed, "dataset": dataset_name},
+        )
+        all_runs.append(result)
+
+    # Aggregate metrics across seeds
+    key_metrics = ["accuracy", "f1_weighted", "f1_macro", "precision_weighted", "recall_weighted"]
+    aggregated = {}
+    for metric in key_metrics:
+        values = [r["test"][metric] for r in all_runs if metric in r.get("test", {})]
+        if values:
+            aggregated[metric] = {
+                "mean": float(np.mean(values)),
+                "std": float(np.std(values)),
+                "values": values,
+            }
+
+    logger.info("=" * 60)
+    logger.info("MULTI-SEED RESULTS (%d seeds)", len(seeds))
+    logger.info("=" * 60)
+    for metric, stats in aggregated.items():
+        logger.info(
+            "  %s: %.4f +/- %.4f",
+            metric, stats["mean"], stats["std"],
+        )
+
+    return {
+        "seeds": seeds,
+        "runs": all_runs,
+        "aggregated": aggregated,
+    }
+
+
+def compute_learning_curve(
+    model_factory,
+    train_texts: list[str],
+    train_labels: list[int],
+    test_texts: list[str],
+    test_labels: list[int],
+    train_sizes: list[int] | None = None,
+) -> list[dict[str, Any]]:
+    """Compute learning curve by training on increasing data sizes.
+
+    Args:
+        model_factory: Callable that returns a fresh SentimentModel instance.
+        train_texts, train_labels: Full training data.
+        test_texts, test_labels: Fixed test data.
+        train_sizes: List of training set sizes to evaluate.
+
+    Returns:
+        List of dicts with train_size, f1_weighted, accuracy.
+    """
+    if train_sizes is None:
+        train_sizes = [500, 1000, 2000, 5000, 10000]
+
+    results = []
+    for size in train_sizes:
+        if size > len(train_texts):
+            continue
+
+        # Stratified subsample
+        from sklearn.model_selection import train_test_split
+        sub_texts, _, sub_labels, _ = train_test_split(
+            train_texts, train_labels, train_size=size,
+            random_state=42, stratify=train_labels,
+        )
+
+        model = model_factory()
+        model.train(sub_texts, sub_labels)
+        preds = model.predict(test_texts)
+
+        from sklearn.metrics import f1_score, accuracy_score
+        f1 = float(f1_score(test_labels, preds, average="weighted"))
+        acc = float(accuracy_score(test_labels, preds))
+
+        results.append({"train_size": size, "f1_weighted": f1, "accuracy": acc})
+        logger.info("  n=%5d → F1=%.4f, Acc=%.4f", size, f1, acc)
+
+    return results
+
+
 class _null_context:
     """No-op context manager when MLflow is disabled."""
     def __enter__(self): return self

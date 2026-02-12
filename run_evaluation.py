@@ -24,14 +24,21 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def _load_dataset(dataset_name: str, max_samples: int | None = None):
-    """Load test split of the specified dataset."""
+def _load_dataset(dataset_name: str, max_test_samples: int | None = None):
+    """Load the specified dataset.
+
+    For Yelp, max_test_samples caps the test set via stratified sampling (default: 5000)
+    to ensure identical test data across all model evaluations.
+    """
     if dataset_name == "german":
         from src.data.loader import load_german_sentiment
         return load_german_sentiment(max_train_samples=None)
     elif dataset_name == "yelp":
         from src.data.loader import load_yelp_reviews
-        return load_yelp_reviews(max_train_samples=max_samples)
+        return load_yelp_reviews(
+            max_train_samples=None,
+            max_test_samples=max_test_samples or 5000,
+        )
     else:
         raise ValueError(f"Unknown dataset: {dataset_name}")
 
@@ -48,17 +55,13 @@ def evaluate_llm(
     from src.models.llm_classifier import LLMSentimentModel
     from config.config import RESULTS_DIR
 
-    # Load data
-    splits = _load_dataset(dataset_name)
+    # Load data (test set is already capped via stratified sampling in loader)
+    splits = _load_dataset(dataset_name, max_test_samples=max_test_samples)
     preprocessor = TextPreprocessor()
     test_df = preprocessor.preprocess_dataframe(splits["test"])
 
     test_texts = test_df["text_clean"].tolist()
     test_labels = test_df["label"].tolist()
-
-    if max_test_samples:
-        test_texts = test_texts[:max_test_samples]
-        test_labels = test_labels[:max_test_samples]
 
     logger.info("Evaluating %s (%s) on %d test samples...", deployment, mode, len(test_texts))
 

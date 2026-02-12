@@ -6,6 +6,8 @@ Trained and evaluated on the [German Sentiment Dataset](https://huggingface.co/d
 
 ## Results
 
+All models evaluated on the **same test set** (1,490 samples, German Sentiment).
+
 | Model | F1 (weighted) | Accuracy | Latency (ms/sample) | Cost/1K ($) |
 |-------|:---:|:---:|:---:|:---:|
 | **gbert-base (fine-tuned)** | **0.9119** | **0.9128** | 1.3 | 0 |
@@ -23,6 +25,25 @@ Trained and evaluated on the [German Sentiment Dataset](https://huggingface.co/d
 - Few-shot prompting surprisingly *hurts* LLM performance vs. zero-shot
 - GPT-4o is not significantly better than GPT-4o-mini for this task but costs 16x more
 - BERT achieves near-real-time latency (1.3ms/sample on T4 GPU) at zero marginal cost
+
+## Methodology
+
+### Evaluation rigor
+
+- **Identical test sets**: All models evaluated on the exact same test split (stratified sampling with `seed=42`)
+- **Multi-seed evaluation**: Classical ML supports training across 3 seeds (42, 123, 456) to report mean +/- std
+- **Learning curves**: Validate that 10K training samples are sufficient (F1 plateaus beyond 5K for most classifiers)
+- **Consistent label mapping**: Yelp 5-star ratings mapped to 3-class (1-2: negative, 3: neutral, 4-5: positive) following Zhang et al. (2015). This is a deliberate design choice for consistency with the German Sentiment dataset (also 3-class). Trade-off: star-3 is only ~20% of Yelp data, creating class imbalance.
+
+### Statistical robustness
+
+```bash
+# Train with 3 seeds and report mean +/- std
+python run_training.py --model classical --classifier svm --dataset german --multi-seed
+
+# Compute learning curve (F1 at 500/1K/2K/5K/10K training samples)
+python run_training.py --model classical --classifier svm --dataset german --learning-curve
+```
 
 ## Project Structure
 
@@ -89,11 +110,13 @@ All models share the same evaluation pipeline (`src/evaluation/metrics.py`):
 - ROC-AUC (One-vs-Rest)
 - Inference latency benchmarks
 - API cost tracking (LLM models)
+- Multi-seed aggregation (mean +/- std)
+- Learning curves
 
 ### Datasets
 
 - **German Sentiment** (primary): 6.4K train / 772 val / 1.5K test, 3-class
-- **Yelp Reviews** (secondary): 650K English reviews, 5-star mapped to 3-class
+- **Yelp Reviews** (secondary): 650K English reviews, 5-star mapped to 3-class (10K train / 5K test subsets)
 
 ## API
 

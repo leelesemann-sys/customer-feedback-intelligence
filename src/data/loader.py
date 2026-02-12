@@ -26,6 +26,8 @@ STAR_TO_SENTIMENT = {0: 0, 1: 0, 2: 1, 3: 2, 4: 2}  # Yelp: 0-4 labels
 
 def load_yelp_reviews(
     max_train_samples: Optional[int] = None,
+    max_test_samples: Optional[int] = None,
+    seed: int = RANDOM_SEED,
 ) -> dict[str, pd.DataFrame]:
     """Load Yelp Reviews from HuggingFace (650K train, 50K test).
 
@@ -33,6 +35,9 @@ def load_yelp_reviews(
 
     Args:
         max_train_samples: Cap training set size for faster iteration.
+        max_test_samples: Cap test set size (stratified). Ensures all models
+            are evaluated on the exact same test subset when using the same seed.
+        seed: Random seed for sampling. Defaults to RANDOM_SEED (42).
 
     Returns:
         Dict with 'train', 'val', 'test' DataFrames.
@@ -47,17 +52,25 @@ def load_yelp_reviews(
 
     if max_train_samples:
         train_df = train_df.sample(
-            n=min(max_train_samples, len(train_df)), random_state=RANDOM_SEED
+            n=min(max_train_samples, len(train_df)), random_state=seed
         ).reset_index(drop=True)
 
     # Split train into train+val (85/15)
     train_split, val_split = train_test_split(
-        train_df, test_size=0.15, random_state=RANDOM_SEED, stratify=train_df["label"]
+        train_df, test_size=0.15, random_state=seed, stratify=train_df["label"]
     )
 
     # Process test split
     test_df = ds["test"].to_pandas()
     test_df = _standardize_yelp(test_df)
+
+    # Subsample test set (stratified, fixed seed) for consistent cross-model eval
+    if max_test_samples and max_test_samples < len(test_df):
+        test_df, _ = train_test_split(
+            test_df, train_size=max_test_samples, random_state=RANDOM_SEED,
+            stratify=test_df["label"]
+        )
+        test_df = test_df.reset_index(drop=True)
 
     splits = {
         "train": train_split.reset_index(drop=True),
@@ -73,13 +86,16 @@ def load_yelp_reviews(
 
 def load_german_sentiment(
     max_train_samples: Optional[int] = None,
+    seed: int = RANDOM_SEED,
 ) -> dict[str, pd.DataFrame]:
     """Load German Sentiment dataset from HuggingFace (8.7K total).
 
     Already has train/val/test splits with 3-class labels.
+    Test set is fixed (1490 samples) — no subsampling needed since it's small.
 
     Args:
         max_train_samples: Cap training set size for faster iteration.
+        seed: Random seed for train subsampling. Defaults to RANDOM_SEED (42).
 
     Returns:
         Dict with 'train', 'val', 'test' DataFrames.
@@ -100,7 +116,7 @@ def load_german_sentiment(
 
         if max_train_samples and split_name == "train":
             df = df.sample(
-                n=min(max_train_samples, len(df)), random_state=RANDOM_SEED
+                n=min(max_train_samples, len(df)), random_state=seed
             ).reset_index(drop=True)
 
         splits[split_name] = df

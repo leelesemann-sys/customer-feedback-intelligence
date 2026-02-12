@@ -1,7 +1,7 @@
 {
   "model": "classical_svm",
   "train": {
-    "train_duration_s": 1.47,
+    "train_duration_s": 2.86,
     "val_f1_weighted": 0.8716905743684109
   },
   "val": {
@@ -41,9 +41,9 @@
     "roc_auc_weighted": null
   },
   "latency": {
-    "total_ms": 7.68,
-    "per_sample_ms": 0.08,
-    "samples_per_second": 13027.8
+    "total_ms": 18.36,
+    "per_sample_ms": 0.18,
+    "samples_per_second": 5447.9
   },
   "test_classification_report": {
     "negative": {

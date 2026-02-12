@@ -6,6 +6,8 @@ Usage:
     python run_training.py --model classical --dataset german
     python run_training.py --model classical --classifier logistic_regression --optimize
     python run_training.py --model all --dataset yelp --max-train-samples 10000
+    python run_training.py --model classical --multi-seed --dataset german
+    python run_training.py --model classical --learning-curve --dataset german
 """
 
 from __future__ import annotations
@@ -22,10 +24,17 @@ logger = logging.getLogger(__name__)
 
 
 def _load_dataset(dataset_name: str, max_train_samples: int | None = None):
-    """Load the specified dataset."""
+    """Load the specified dataset.
+
+    For Yelp, test set defaults to 5K stratified samples for consistency
+    across all model evaluations (Classical ML, BERT notebook, LLM).
+    """
     if dataset_name == "yelp":
         from src.data.loader import load_yelp_reviews
-        return load_yelp_reviews(max_train_samples=max_train_samples)
+        return load_yelp_reviews(
+            max_train_samples=max_train_samples,
+            max_test_samples=5000,
+        )
     elif dataset_name == "german":
         from src.data.loader import load_german_sentiment
         return load_german_sentiment(max_train_samples=max_train_samples)
@@ -101,6 +110,85 @@ def train_all_classical(
         )
 
 
+def train_multi_seed(
+    classifier_name: str = "logistic_regression",
+    dataset_name: str = "german",
+    max_train_samples: int | None = None,
+) -> None:
+    """Train a classical model across multiple seeds for statistical robustness."""
+    import json
+    from functools import partial
+    from config.config import EVAL_SEEDS, RESULTS_DIR
+    from src.models.classical import ClassicalSentimentModel
+    from src.training.trainer import train_multi_seed as _train_multi_seed
+
+    if dataset_name == "german":
+        from src.data.loader import load_german_sentiment
+        loader = partial(load_german_sentiment, max_train_samples=max_train_samples)
+    else:
+        from src.data.loader import load_yelp_reviews
+        loader = partial(load_yelp_reviews, max_train_samples=max_train_samples)
+
+    result = _train_multi_seed(
+        model_factory=lambda: ClassicalSentimentModel(classifier_name=classifier_name),
+        dataset_loader=loader,
+        seeds=EVAL_SEEDS,
+        dataset_name=dataset_name,
+        max_train_samples=max_train_samples,
+    )
+
+    # Save aggregated results
+    out_path = RESULTS_DIR / "metrics" / f"multi_seed_{classifier_name}_{dataset_name}.json"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, "w") as f:
+        json.dump(result, f, indent=2, default=str)
+    logger.info("Multi-seed results saved to %s", out_path)
+
+
+def run_learning_curve(
+    classifier_name: str = "logistic_regression",
+    dataset_name: str = "german",
+) -> None:
+    """Compute learning curve for a classical model."""
+    import json
+    from config.config import RESULTS_DIR
+    from src.data.preprocessor import TextPreprocessor
+    from src.models.classical import ClassicalSentimentModel
+    from src.training.trainer import compute_learning_curve
+
+    if dataset_name == "german":
+        from src.data.loader import load_german_sentiment
+        splits = load_german_sentiment()
+    else:
+        from src.data.loader import load_yelp_reviews
+        splits = load_yelp_reviews(max_train_samples=50000)
+
+    preprocessor = TextPreprocessor()
+    for split_name in splits:
+        splits[split_name] = preprocessor.preprocess_dataframe(splits[split_name])
+
+    train_sizes = [500, 1000, 2000, 5000, 10000]
+    if dataset_name == "yelp":
+        train_sizes.append(25000)
+        train_sizes.append(50000)
+
+    logger.info("Computing learning curve for %s on %s...", classifier_name, dataset_name)
+    results = compute_learning_curve(
+        model_factory=lambda: ClassicalSentimentModel(classifier_name=classifier_name),
+        train_texts=splits["train"]["text_clean"].tolist(),
+        train_labels=splits["train"]["label"].tolist(),
+        test_texts=splits["test"]["text_clean"].tolist(),
+        test_labels=splits["test"]["label"].tolist(),
+        train_sizes=train_sizes,
+    )
+
+    out_path = RESULTS_DIR / "metrics" / f"learning_curve_{classifier_name}_{dataset_name}.json"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, "w") as f:
+        json.dump(results, f, indent=2)
+    logger.info("Learning curve saved to %s", out_path)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Train sentiment models")
     parser.add_argument(
@@ -132,10 +220,31 @@ def main():
         default=None,
         help="Cap training set size (for faster iteration)",
     )
+    parser.add_argument(
+        "--multi-seed",
+        action="store_true",
+        help="Train across 3 seeds and report mean +/- std",
+    )
+    parser.add_argument(
+        "--learning-curve",
+        action="store_true",
+        help="Compute learning curve (F1 at different training set sizes)",
+    )
 
     args = parser.parse_args()
 
-    if args.model == "classical":
+    if args.learning_curve and args.model == "classical":
+        run_learning_curve(
+            classifier_name=args.classifier,
+            dataset_name=args.dataset,
+        )
+    elif args.multi_seed and args.model == "classical":
+        train_multi_seed(
+            classifier_name=args.classifier,
+            dataset_name=args.dataset,
+            max_train_samples=args.max_train_samples,
+        )
+    elif args.model == "classical":
         train_classical(
             classifier_name=args.classifier,
             dataset_name=args.dataset,
