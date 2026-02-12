@@ -7,7 +7,7 @@ A systematic comparison of three ML approaches for sentiment classification: **C
 
 Evaluated on two datasets: [German Sentiment](https://huggingface.co/datasets/sepidmnorozy/German_sentiment) (8.7K samples, 3-class) and [Yelp Reviews](https://huggingface.co/datasets/Yelp/yelp_review_full) (650K English reviews, 5-star → 3-class).
 
-> **[Live Dashboard](https://customer-feedback-intelligence.streamlit.app)** — Interactive results explorer with model comparison, error analysis, and live demo.
+> **[Live Dashboard](https://customer-feedback-intelligence.streamlit.app)** | **[GitHub Repo](https://github.com/leelesemann-sys/customer-feedback-intelligence)** — Interactive results explorer with model comparison, error analysis, and live demo.
 
 ## Results
 

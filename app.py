@@ -143,6 +143,13 @@ page = st.sidebar.radio(
     ["Overview", "Model Comparison", "Error Analysis", "Methodology", "Live Demo", "Batch Analysis"],
 )
 
+st.sidebar.markdown("---")
+st.sidebar.markdown(
+    "[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)]"
+    "(https://github.com/leelesemann-sys/customer-feedback-intelligence)"
+)
+st.sidebar.caption("Built with Streamlit, scikit-learn, HuggingFace Transformers & Azure OpenAI")
+
 
 # ==================== PAGE 1: Overview ====================
 if page == "Overview":
