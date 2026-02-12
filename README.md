@@ -1,17 +1,19 @@
 # Customer Feedback Intelligence
 
-A systematic comparison of three ML approaches for German sentiment classification: **Classical ML** (TF-IDF + traditional classifiers), **Fine-tuned BERT** (deepset/gbert-base), and **LLM-based** (Azure OpenAI GPT-4o zero/few-shot).
+A systematic comparison of three ML approaches for sentiment classification: **Classical ML** (TF-IDF + traditional classifiers), **Fine-tuned BERT**, and **LLM-based** (Azure OpenAI GPT-4o zero/few-shot).
 
-Trained and evaluated on the [German Sentiment Dataset](https://huggingface.co/datasets/sepidmnorozy/German_sentiment) (8.7K samples, 3-class: negative/neutral/positive).
+Evaluated on two datasets: [German Sentiment](https://huggingface.co/datasets/sepidmnorozy/German_sentiment) (8.7K samples, 3-class) and [Yelp Reviews](https://huggingface.co/datasets/Yelp/yelp_review_full) (650K English reviews, 5-star → 3-class).
 
 ## Results
 
-All models evaluated on the **same test set** (1,490 samples, German Sentiment).
+### German Sentiment (1,490 test samples)
+
+All models evaluated on the **same test set** (stratified split, `seed=42`).
 
 | Model | F1 (weighted) | Accuracy | Latency (ms/sample) | Cost/1K ($) |
 |-------|:---:|:---:|:---:|:---:|
 | **gbert-base (fine-tuned)** | **0.9119** | **0.9128** | 1.3 | 0 |
-| SVM (TF-IDF) | 0.8562 | 0.8725 | 0.1 | 0 |
+| SVM (TF-IDF) | 0.8562 | 0.8725 | 0.2 | 0 |
 | Logistic Regression (TF-IDF) | 0.8505 | 0.8503 | 0.1 | 0 |
 | Naive Bayes (TF-IDF) | 0.7956 | 0.8584 | 0.1 | 0 |
 | GPT-4o-mini (zero-shot) | 0.7517 | 0.6700 | 966 | 0.19 |
@@ -19,12 +21,24 @@ All models evaluated on the **same test set** (1,490 samples, German Sentiment).
 | GPT-4o (few-shot) | 0.5359 | 0.4450 | 1878 | 2.80 |
 | GPT-4o-mini (few-shot) | 0.5054 | 0.4200 | 1889 | 0.17 |
 
-**Key findings:**
-- **Fine-tuned BERT wins** with F1=0.912 — 5.6 points above the best classical model
-- Classical ML with TF-IDF features outperforms zero-shot LLMs on this dataset
+### Yelp Reviews — English (5,000 test samples)
+
+5-star ratings mapped to 3-class (1-2★ negative, 3★ neutral, 4-5★ positive). 10K stratified train subset.
+
+| Model | F1 (weighted) | Accuracy | ROC-AUC | Latency (ms/sample) |
+|-------|:---:|:---:|:---:|:---:|
+| **bert-base-uncased (fine-tuned)** | **0.7607** | **0.7576** | **0.9135** | 1.4 |
+
+> Classical ML and LLM results on Yelp coming soon.
+
+### Key findings
+
+- **Fine-tuned BERT wins** with F1=0.912 on German — 5.6 points above the best classical model
+- Classical ML with TF-IDF features outperforms zero-shot LLMs on the German dataset
 - Few-shot prompting surprisingly *hurts* LLM performance vs. zero-shot
 - GPT-4o is not significantly better than GPT-4o-mini for this task but costs 16x more
 - BERT achieves near-real-time latency (1.3ms/sample on T4 GPU) at zero marginal cost
+- On Yelp, BERT (F1=0.761) handles 3-class English sentiment well; neutral class is hardest (F1=0.496) due to class imbalance
 
 ## Methodology
 
@@ -98,7 +112,7 @@ uvicorn src.api:app --reload
 
 1. **Classical ML** (`src/models/classical.py`): TF-IDF vectorization (unigrams + bigrams, 50K features) with Logistic Regression, LinearSVC, or Multinomial Naive Bayes. Hyperparameter tuning via Optuna.
 
-2. **Fine-tuned BERT** (`src/models/bert_classifier.py`): `deepset/gbert-base` (110M params) fine-tuned with HuggingFace Trainer. Training notebook for Google Colab included.
+2. **Fine-tuned BERT** (`src/models/bert_classifier.py`): `deepset/gbert-base` (German, 110M params) and `bert-base-uncased` (English, 110M params) fine-tuned with HuggingFace Trainer. Training notebooks for Google Colab included.
 
 3. **LLM Zero/Few-Shot** (`src/models/llm_classifier.py`): Azure OpenAI GPT-4o and GPT-4o-mini with structured JSON output. Includes retry logic, cost tracking, and response caching.
 
