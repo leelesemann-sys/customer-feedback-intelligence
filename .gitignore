@@ -1,0 +1,46 @@
+# Data
+data/raw/
+data/processed/
+
+# Model checkpoints
+models/*.pt
+models/*.pkl
+models/*.joblib
+models/*/
+
+# Results (regeneratable)
+results/metrics/*.json
+results/plots/*.png
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# MLflow
+mlruns/
+
+# Environment
+.env
