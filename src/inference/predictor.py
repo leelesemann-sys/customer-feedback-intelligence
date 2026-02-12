@@ -10,8 +10,6 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-import numpy as np
-
 from config.config import LABEL_NAMES, MODELS_DIR
 from src.data.preprocessor import TextPreprocessor
 from src.models.base import SentimentModel

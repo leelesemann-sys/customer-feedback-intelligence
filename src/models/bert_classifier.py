@@ -14,7 +14,6 @@ from typing import Any, Optional
 
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
 from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
@@ -23,7 +22,6 @@ from transformers import (
     EarlyStoppingCallback,
 )
 from sklearn.metrics import f1_score, accuracy_score
-import datasets as hf_datasets
 
 from config.config import (
     BERT_BATCH_SIZE,

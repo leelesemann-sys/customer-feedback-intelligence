@@ -8,7 +8,6 @@ import pytest
 
 from src.models.llm_classifier import (
     LLMSentimentModel,
-    SYSTEM_PROMPT_ZERO_SHOT,
     _build_few_shot_messages,
 )
 
