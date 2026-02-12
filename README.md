@@ -1,8 +1,13 @@
 # Customer Feedback Intelligence
 
+[![CI](https://github.com/leelesemann-sys/customer-feedback-intelligence/actions/workflows/ci.yml/badge.svg)](https://github.com/leelesemann-sys/customer-feedback-intelligence/actions/workflows/ci.yml)
+[![Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://customer-feedback-intelligence.streamlit.app)
+
 A systematic comparison of three ML approaches for sentiment classification: **Classical ML** (TF-IDF + traditional classifiers), **Fine-tuned BERT**, and **LLM-based** (Azure OpenAI GPT-4o zero/few-shot).
 
 Evaluated on two datasets: [German Sentiment](https://huggingface.co/datasets/sepidmnorozy/German_sentiment) (8.7K samples, 3-class) and [Yelp Reviews](https://huggingface.co/datasets/Yelp/yelp_review_full) (650K English reviews, 5-star → 3-class).
+
+> **[Live Dashboard](https://customer-feedback-intelligence.streamlit.app)** — Interactive results explorer with model comparison, error analysis, and live demo.
 
 ## Results
 

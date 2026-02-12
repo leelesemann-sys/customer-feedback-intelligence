@@ -7,6 +7,8 @@ models/*.pt
 models/*.pkl
 models/*.joblib
 models/*/
+# Exception: keep LogReg for Streamlit Cloud live demo
+!models/classical_logistic_regression.joblib
 
 # Results (regeneratable)
 results/metrics/*.json

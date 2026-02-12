@@ -496,7 +496,18 @@ embeddings provide more value for morphologically complex languages.
 # ==================== PAGE 5: Live Demo ====================
 elif page == "Live Demo":
     st.title("Live Sentiment Demo")
-    st.markdown("Enter text to classify with any available model.")
+    st.markdown("Enter German text to classify with the trained Logistic Regression model (TF-IDF).")
+
+    # Check if model is available
+    from pathlib import Path as _Path
+    _model_path = _Path(__file__).parent / "models" / "classical_logistic_regression.joblib"
+    _model_available = _model_path.exists()
+
+    if not _model_available:
+        st.warning(
+            "No trained model found. To enable the live demo, train a model locally:\n\n"
+            "```\npython run_training.py --model classical --classifier logistic_regression --dataset german\n```"
+        )
 
     text_input = st.text_area(
         "Enter customer feedback:",
@@ -504,33 +515,12 @@ elif page == "Live Demo":
         placeholder="z.B. 'Das Produkt ist ausgezeichnet! Sehr gute Qualitaet.'",
     )
 
-    col1, col2 = st.columns(2)
-    with col1:
-        model_type = st.selectbox(
-            "Model",
-            ["classical", "llm"],
-            help="Select which model to use for prediction.",
-        )
-    with col2:
-        if model_type == "llm":
-            deployment = st.selectbox("Deployment", ["gpt-4o-mini", "gpt-4o"])
-            mode = st.selectbox("Mode", ["zero_shot", "few_shot"])
-
-    if st.button("Classify", type="primary") and text_input.strip():
+    if st.button("Classify", type="primary", disabled=not _model_available) and text_input.strip():
         with st.spinner("Classifying..."):
             try:
                 from src.inference.predictor import SentimentPredictor
 
-                if model_type == "classical":
-                    predictor = SentimentPredictor.from_classical()
-                elif model_type == "llm":
-                    predictor = SentimentPredictor.from_llm(
-                        deployment=deployment, mode=mode
-                    )
-                else:
-                    st.error(f"Unknown model type: {model_type}")
-                    st.stop()
-
+                predictor = SentimentPredictor.from_classical()
                 result = predictor.predict_single(text_input)
 
                 sentiment_colors = {
@@ -559,8 +549,6 @@ elif page == "Live Demo":
                 fig.update_layout(showlegend=False, height=200, margin=dict(l=0, r=0, t=0, b=0))
                 st.plotly_chart(fig, use_container_width=True)
 
-            except FileNotFoundError:
-                st.error("Model not found. Please train the model first.")
             except Exception as e:
                 st.error(f"Error: {e}")
 
@@ -569,6 +557,15 @@ elif page == "Live Demo":
 elif page == "Batch Analysis":
     st.title("Batch Analysis")
     st.markdown("Upload a CSV file with a `text` column to classify all rows.")
+
+    from pathlib import Path as _Path2
+    _model_path2 = _Path2(__file__).parent / "models" / "classical_logistic_regression.joblib"
+
+    if not _model_path2.exists():
+        st.warning(
+            "No trained model found. Train a model first to enable batch classification."
+        )
+        st.stop()
 
     uploaded = st.file_uploader("Upload CSV", type=["csv"])
 
@@ -582,18 +579,12 @@ elif page == "Batch Analysis":
         st.dataframe(df.head(10))
         st.info(f"Found {len(df)} rows.")
 
-        model_type = st.selectbox("Model", ["classical", "llm"])
-
         if st.button("Classify All", type="primary"):
             with st.spinner(f"Classifying {len(df)} texts..."):
                 try:
                     from src.inference.predictor import SentimentPredictor
 
-                    if model_type == "classical":
-                        predictor = SentimentPredictor.from_classical()
-                    else:
-                        predictor = SentimentPredictor.from_llm()
-
+                    predictor = SentimentPredictor.from_classical()
                     results = predictor.predict_batch(df["text"].tolist())
 
                     df["sentiment"] = [r["label_name"] for r in results]
