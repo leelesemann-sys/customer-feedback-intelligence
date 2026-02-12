@@ -55,7 +55,9 @@ TEST_SIZE = 0.15
 VAL_SIZE = 0.15
 
 # MLflow
-MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", str(PROJECT_ROOT / "mlruns"))
+MLFLOW_TRACKING_URI = os.getenv(
+    "MLFLOW_TRACKING_URI", (PROJECT_ROOT / "mlruns").as_uri()
+)
 MLFLOW_EXPERIMENT_NAME = os.getenv(
     "MLFLOW_EXPERIMENT_NAME", "customer-feedback-intelligence"
 )

@@ -2,10 +2,10 @@
 CLI for training sentiment models.
 
 Usage:
-    python run_training.py --model classical
+    python run_training.py --model classical --dataset yelp
+    python run_training.py --model classical --dataset german
     python run_training.py --model classical --classifier logistic_regression --optimize
-    python run_training.py --model bert
-    python run_training.py --model all
+    python run_training.py --model all --dataset yelp --max-train-samples 10000
 """
 
 from __future__ import annotations
@@ -21,13 +21,25 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def _load_dataset(dataset_name: str, max_train_samples: int | None = None):
+    """Load the specified dataset."""
+    if dataset_name == "yelp":
+        from src.data.loader import load_yelp_reviews
+        return load_yelp_reviews(max_train_samples=max_train_samples)
+    elif dataset_name == "german":
+        from src.data.loader import load_german_sentiment
+        return load_german_sentiment(max_train_samples=max_train_samples)
+    else:
+        raise ValueError(f"Unknown dataset: {dataset_name}")
+
+
 def train_classical(
     classifier_name: str = "logistic_regression",
+    dataset_name: str = "yelp",
     optimize: bool = False,
     max_train_samples: int | None = None,
 ) -> None:
     """Train a classical ML model."""
-    from src.data.loader import load_amazon_reviews
     from src.data.preprocessor import TextPreprocessor
     from src.models.classical import ClassicalSentimentModel
     from src.training.trainer import setup_mlflow, train_and_evaluate
@@ -35,7 +47,7 @@ def train_classical(
     setup_mlflow()
 
     # Load data
-    splits = load_amazon_reviews(max_train_samples=max_train_samples)
+    splits = _load_dataset(dataset_name, max_train_samples)
     preprocessor = TextPreprocessor()
 
     for split_name in splits:
@@ -59,7 +71,7 @@ def train_classical(
         extra_params = result["best_params"]
     else:
         model = ClassicalSentimentModel(classifier_name=classifier_name)
-        extra_params = {"classifier": classifier_name}
+        extra_params = {"classifier": classifier_name, "dataset": dataset_name}
 
     train_and_evaluate(
         model=model,
@@ -73,13 +85,20 @@ def train_classical(
     )
 
 
-def train_all_classical(max_train_samples: int | None = None) -> None:
+def train_all_classical(
+    dataset_name: str = "yelp",
+    max_train_samples: int | None = None,
+) -> None:
     """Train all three classical models."""
     for clf in ["logistic_regression", "svm", "naive_bayes"]:
         logger.info("=" * 60)
         logger.info("Training %s", clf)
         logger.info("=" * 60)
-        train_classical(classifier_name=clf, max_train_samples=max_train_samples)
+        train_classical(
+            classifier_name=clf,
+            dataset_name=dataset_name,
+            max_train_samples=max_train_samples,
+        )
 
 
 def main():
@@ -89,6 +108,12 @@ def main():
         choices=["classical", "bert", "all"],
         required=True,
         help="Model type to train",
+    )
+    parser.add_argument(
+        "--dataset",
+        choices=["yelp", "german"],
+        default="yelp",
+        help="Dataset to train on (default: yelp)",
     )
     parser.add_argument(
         "--classifier",
@@ -113,11 +138,15 @@ def main():
     if args.model == "classical":
         train_classical(
             classifier_name=args.classifier,
+            dataset_name=args.dataset,
             optimize=args.optimize,
             max_train_samples=args.max_train_samples,
         )
     elif args.model == "all":
-        train_all_classical(max_train_samples=args.max_train_samples)
+        train_all_classical(
+            dataset_name=args.dataset,
+            max_train_samples=args.max_train_samples,
+        )
     elif args.model == "bert":
         logger.info("BERT training not yet implemented.")
         sys.exit(1)

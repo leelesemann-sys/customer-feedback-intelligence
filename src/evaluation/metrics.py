@@ -47,7 +47,9 @@ def compute_metrics(
         "recall_weighted": float(recall_score(y_true, y_pred, average="weighted")),
         "confusion_matrix": confusion_matrix(y_true, y_pred).tolist(),
         "classification_report": classification_report(
-            y_true, y_pred, target_names=LABEL_NAMES, output_dict=True
+            y_true, y_pred, target_names=LABEL_NAMES,
+            labels=list(range(len(LABEL_NAMES))), output_dict=True,
+            zero_division=0,
         ),
     }
 
