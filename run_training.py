@@ -105,9 +105,9 @@ def main():
     parser = argparse.ArgumentParser(description="Train sentiment models")
     parser.add_argument(
         "--model",
-        choices=["classical", "bert", "all"],
+        choices=["classical", "bert", "llm", "all"],
         required=True,
-        help="Model type to train",
+        help="Model type to train (llm = evaluate via run_evaluation.py)",
     )
     parser.add_argument(
         "--dataset",
@@ -148,8 +148,12 @@ def main():
             max_train_samples=args.max_train_samples,
         )
     elif args.model == "bert":
-        logger.info("BERT training not yet implemented.")
+        logger.info("BERT training: use notebooks/04_bert_finetuning.ipynb on Google Colab.")
         sys.exit(1)
+    elif args.model == "llm":
+        logger.info("LLM models don't require training. Use run_evaluation.py instead:")
+        logger.info("  python run_evaluation.py --model llm --deployment gpt-4o-mini --mode zero_shot")
+        sys.exit(0)
 
 
 if __name__ == "__main__":
