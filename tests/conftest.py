@@ -7,20 +7,24 @@ import numpy as np
 
 @pytest.fixture
 def sample_texts():
-    """German review texts for testing."""
+    """German review texts for testing (3+ per class for CV compatibility)."""
     return [
         "Das Produkt ist ausgezeichnet! Sehr gute Qualitaet.",
-        "Furchtbar. Kaputt angekommen, nie wieder.",
-        "Ganz okay, nichts Besonderes.",
         "Schnelle Lieferung und tolles Design!",
+        "Hervorragend, kann ich nur empfehlen.",
+        "Furchtbar. Kaputt angekommen, nie wieder.",
         "Mangelhaft. Funktioniert nicht wie beschrieben.",
+        "Schlecht verarbeitet, sehr enttaeuschend.",
+        "Ganz okay, nichts Besonderes.",
+        "Durchschnittlich, weder gut noch schlecht.",
+        "Normal, passt schon so.",
     ]
 
 
 @pytest.fixture
 def sample_labels():
-    """Labels matching sample_texts: pos, neg, neu, pos, neg."""
-    return [2, 0, 1, 2, 0]
+    """Labels matching sample_texts: 3x pos, 3x neg, 3x neu."""
+    return [2, 2, 2, 0, 0, 0, 1, 1, 1]
 
 
 @pytest.fixture
