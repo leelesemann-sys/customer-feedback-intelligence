@@ -1,0 +1,79 @@
+{
+  "model": "llm_gpt-4o_zero_shot",
+  "deployment": "gpt-4o",
+  "mode": "zero_shot",
+  "dataset": "german",
+  "n_test_samples": 200,
+  "duration_s": 209.91,
+  "test": {
+    "accuracy": 0.585,
+    "f1_weighted": 0.6807887023714361,
+    "f1_macro": 0.3334221511679545,
+    "precision_weighted": 0.8960843373493976,
+    "recall_weighted": 0.585,
+    "confusion_matrix": [
+      [
+        103,
+        69,
+        3
+      ],
+      [
+        0,
+        14,
+        11
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "roc_auc_weighted": null
+  },
+  "latency": {
+    "total_ms": 209914.08,
+    "per_sample_ms": 1049.57,
+    "samples_per_second": 1.0
+  },
+  "cost": {
+    "input_tokens": 27308,
+    "output_tokens": 2910,
+    "input_cost_usd": 0.0683,
+    "output_cost_usd": 0.0291,
+    "total_cost_usd": 0.0974,
+    "cost_per_1k_predictions": 3.2223
+  },
+  "test_classification_report": {
+    "negative": {
+      "precision": 1.0,
+      "recall": 0.5885714285714285,
+      "f1-score": 0.7410071942446043,
+      "support": 175.0
+    },
+    "neutral": {
+      "precision": 0.1686746987951807,
+      "recall": 0.56,
+      "f1-score": 0.25925925925925924,
+      "support": 25.0
+    },
+    "positive": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 0.0
+    },
+    "accuracy": 0.585,
+    "macro avg": {
+      "precision": 0.38955823293172687,
+      "recall": 0.38285714285714284,
+      "f1-score": 0.3334221511679545,
+      "support": 200.0
+    },
+    "weighted avg": {
+      "precision": 0.8960843373493976,
+      "recall": 0.585,
+      "f1-score": 0.6807887023714361,
+      "support": 200.0
+    }
+  }
+}
