@@ -92,7 +92,7 @@ customer-feedback-intelligence/
 # Setup
 python -m venv venv
 source venv/bin/activate  # or venv\Scripts\activate on Windows
-pip install -r requirements.txt
+pip install -r requirements-full.txt
 
 # Train classical models on German Sentiment
 python run_training.py --model all --dataset german
