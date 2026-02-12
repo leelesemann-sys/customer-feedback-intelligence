@@ -8,21 +8,21 @@ Trained and evaluated on the [German Sentiment Dataset](https://huggingface.co/d
 
 | Model | F1 (weighted) | Accuracy | Latency (ms/sample) | Cost/1K ($) |
 |-------|:---:|:---:|:---:|:---:|
-| **SVM (TF-IDF)** | **0.8562** | **0.8725** | 0.1 | 0 |
+| **gbert-base (fine-tuned)** | **0.9119** | **0.9128** | 1.3 | 0 |
+| SVM (TF-IDF) | 0.8562 | 0.8725 | 0.1 | 0 |
 | Logistic Regression (TF-IDF) | 0.8505 | 0.8503 | 0.1 | 0 |
 | Naive Bayes (TF-IDF) | 0.7956 | 0.8584 | 0.1 | 0 |
-| gbert-base (fine-tuned) | *pending* | *pending* | ~50 | 0 |
 | GPT-4o-mini (zero-shot) | 0.7517 | 0.6700 | 966 | 0.19 |
 | GPT-4o (zero-shot) | 0.6808 | 0.5850 | 1050 | 3.22 |
 | GPT-4o (few-shot) | 0.5359 | 0.4450 | 1878 | 2.80 |
 | GPT-4o-mini (few-shot) | 0.5054 | 0.4200 | 1889 | 0.17 |
 
 **Key findings:**
+- **Fine-tuned BERT wins** with F1=0.912 — 5.6 points above the best classical model
 - Classical ML with TF-IDF features outperforms zero-shot LLMs on this dataset
-- SVM achieves the best F1 (0.856) with sub-millisecond latency and zero marginal cost
 - Few-shot prompting surprisingly *hurts* LLM performance vs. zero-shot
 - GPT-4o is not significantly better than GPT-4o-mini for this task but costs 16x more
-- Fine-tuned BERT is expected to be the overall best (pending Colab training)
+- BERT achieves near-real-time latency (1.3ms/sample on T4 GPU) at zero marginal cost
 
 ## Project Structure
 

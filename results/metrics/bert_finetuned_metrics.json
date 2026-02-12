@@ -1,0 +1,65 @@
+{
+  "model": "bert_finetuned_gbert_base",
+  "base_model": "deepset/gbert-base",
+  "dataset": "sepidmnorozy/German_sentiment",
+  "train": {
+    "train_duration_s": 281.53,
+    "train_loss": 0.1881
+  },
+  "test": {
+    "accuracy": 0.912751677852349,
+    "f1_weighted": 0.9118731611680574,
+    "f1_macro": 0.8183989859594384,
+    "precision_weighted": 0.9111330439726643,
+    "recall_weighted": 0.912751677852349,
+    "roc_auc_weighted": null
+  },
+  "latency": {
+    "total_ms": 127.38,
+    "per_sample_ms": 1.27,
+    "samples_per_second": 785.1
+  },
+  "classification_report": {
+    "negative": {
+      "precision": 0.9456099456099456,
+      "recall": 0.9530148786217698,
+      "f1-score": 0.9492979719188768,
+      "support": 1277.0
+    },
+    "neutral": {
+      "precision": 0.7044334975369458,
+      "recall": 0.6713615023474179,
+      "f1-score": 0.6875,
+      "support": 213.0
+    },
+    "positive": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 0.0
+    },
+    "accuracy": 0.912751677852349,
+    "macro avg": {
+      "precision": 0.5500144810489638,
+      "recall": 0.5414587936563958,
+      "f1-score": 0.545599323972959,
+      "support": 1490.0
+    },
+    "weighted avg": {
+      "precision": 0.9111330439726643,
+      "recall": 0.912751677852349,
+      "f1-score": 0.9118731611680574,
+      "support": 1490.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      1217,
+      60
+    ],
+    [
+      70,
+      143
+    ]
+  ]
+}
