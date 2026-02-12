@@ -40,6 +40,7 @@ def train_and_evaluate(
     val_labels: list[int],
     test_texts: list[str],
     test_labels: list[int],
+    dataset_name: str = "german",
     log_to_mlflow: bool = True,
     save_model: bool = True,
     extra_params: dict[str, Any] | None = None,
@@ -51,6 +52,7 @@ def train_and_evaluate(
         train_texts, train_labels: Training data.
         val_texts, val_labels: Validation data.
         test_texts, test_labels: Test data.
+        dataset_name: Dataset identifier for metrics filename (e.g., 'german', 'yelp').
         log_to_mlflow: Whether to log to MLflow.
         save_model: Whether to save model artifacts.
         extra_params: Additional params to log (e.g., hyperparameters).
@@ -110,7 +112,9 @@ def train_and_evaluate(
             "test_classification_report": test_metrics.get("classification_report"),
         }
 
-        metrics_path = RESULTS_DIR / "metrics" / f"{model.name}.json"
+        # Include dataset name in filename to avoid cross-dataset overwrites
+        suffix = f"_{dataset_name}" if dataset_name != "german" else ""
+        metrics_path = RESULTS_DIR / "metrics" / f"{model.name}{suffix}.json"
         metrics_path.parent.mkdir(parents=True, exist_ok=True)
         with open(metrics_path, "w") as f:
             json.dump(all_results, f, indent=2, default=str)

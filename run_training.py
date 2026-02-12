@@ -90,6 +90,7 @@ def train_classical(
         val_labels=val_labels,
         test_texts=test_texts,
         test_labels=test_labels,
+        dataset_name=dataset_name,
         extra_params=extra_params,
     )
 

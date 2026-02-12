@@ -28,17 +28,19 @@ All models evaluated on the **same test set** (stratified split, `seed=42`).
 | Model | F1 (weighted) | Accuracy | ROC-AUC | Latency (ms/sample) |
 |-------|:---:|:---:|:---:|:---:|
 | **bert-base-uncased (fine-tuned)** | **0.7607** | **0.7576** | **0.9135** | 1.4 |
-
-> Classical ML and LLM results on Yelp coming soon.
+| Logistic Regression (TF-IDF) | 0.7431 | 0.7393 | 0.9022 | 0.4 |
+| SVM (TF-IDF) | 0.7375 | 0.7574 | 0.9028 | 0.3 |
+| Naive Bayes (TF-IDF) | 0.6340 | 0.7129 | 0.8671 | 0.3 |
 
 ### Key findings
 
-- **Fine-tuned BERT wins** with F1=0.912 on German — 5.6 points above the best classical model
+- **Fine-tuned BERT wins on both datasets**: German F1=0.912 (+5.6pp vs. best classical), Yelp F1=0.761 (+1.8pp)
 - Classical ML with TF-IDF features outperforms zero-shot LLMs on the German dataset
+- On Yelp, BERT's advantage over classical ML shrinks — Logistic Regression (F1=0.743) nearly matches BERT (F1=0.761)
 - Few-shot prompting surprisingly *hurts* LLM performance vs. zero-shot
 - GPT-4o is not significantly better than GPT-4o-mini for this task but costs 16x more
 - BERT achieves near-real-time latency (1.3ms/sample on T4 GPU) at zero marginal cost
-- On Yelp, BERT (F1=0.761) handles 3-class English sentiment well; neutral class is hardest (F1=0.496) due to class imbalance
+- Neutral class is hardest across all models on Yelp (BERT neutral F1=0.496, LogReg neutral F1=0.489) due to class imbalance (~20%)
 
 ## Methodology
 

@@ -1,0 +1,95 @@
+{
+  "model": "classical_svm",
+  "train": {
+    "train_duration_s": 6.15,
+    "val_f1_weighted": 0.7382842939639578
+  },
+  "val": {
+    "accuracy": 0.7566666666666667,
+    "f1_weighted": 0.7382842939639578,
+    "f1_macro": 0.6816552437696854,
+    "precision_weighted": 0.7376901238669971,
+    "recall_weighted": 0.7566666666666667,
+    "confusion_matrix": [
+      [
+        523,
+        40,
+        41
+      ],
+      [
+        108,
+        93,
+        96
+      ],
+      [
+        48,
+        32,
+        519
+      ]
+    ],
+    "roc_auc_weighted": 0.8998864140529091
+  },
+  "test": {
+    "accuracy": 0.7573514702940588,
+    "f1_weighted": 0.7374609084064802,
+    "f1_macro": 0.6780974471307544,
+    "precision_weighted": 0.7350724556819382,
+    "recall_weighted": 0.7573514702940588,
+    "confusion_matrix": [
+      [
+        1737,
+        144,
+        118
+      ],
+      [
+        367,
+        296,
+        337
+      ],
+      [
+        134,
+        113,
+        1753
+      ]
+    ],
+    "roc_auc_weighted": 0.9049110172727087
+  },
+  "latency": {
+    "total_ms": 24.68,
+    "per_sample_ms": 0.25,
+    "samples_per_second": 4052.3
+  },
+  "test_classification_report": {
+    "negative": {
+      "precision": 0.7761394101876675,
+      "recall": 0.8689344672336168,
+      "f1-score": 0.8199197545433089,
+      "support": 1999.0
+    },
+    "neutral": {
+      "precision": 0.5352622061482821,
+      "recall": 0.296,
+      "f1-score": 0.3811976819059884,
+      "support": 1000.0
+    },
+    "positive": {
+      "precision": 0.7939311594202898,
+      "recall": 0.8765,
+      "f1-score": 0.8331749049429658,
+      "support": 2000.0
+    },
+    "accuracy": 0.7573514702940588,
+    "macro avg": {
+      "precision": 0.7017775919187464,
+      "recall": 0.680478155744539,
+      "f1-score": 0.6780974471307544,
+      "support": 4999.0
+    },
+    "weighted avg": {
+      "precision": 0.7350724556819382,
+      "recall": 0.7573514702940588,
+      "f1-score": 0.7374609084064802,
+      "support": 4999.0
+    }
+  }
+}

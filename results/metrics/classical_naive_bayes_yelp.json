@@ -1,0 +1,95 @@
+{
+  "model": "classical_naive_bayes",
+  "train": {
+    "train_duration_s": 4.14,
+    "val_f1_weighted": 0.6338328761744743
+  },
+  "val": {
+    "accuracy": 0.712,
+    "f1_weighted": 0.6338328761744743,
+    "f1_macro": 0.5268831709605966,
+    "precision_weighted": 0.5722162359145118,
+    "recall_weighted": 0.712,
+    "confusion_matrix": [
+      [
+        554,
+        0,
+        50
+      ],
+      [
+        163,
+        0,
+        134
+      ],
+      [
+        85,
+        0,
+        514
+      ]
+    ],
+    "roc_auc_weighted": 0.8604177423942686
+  },
+  "test": {
+    "accuracy": 0.7129425885177035,
+    "f1_weighted": 0.6339795570551071,
+    "f1_macro": 0.5286757654618731,
+    "precision_weighted": 0.7713224958665017,
+    "recall_weighted": 0.7129425885177035,
+    "confusion_matrix": [
+      [
+        1846,
+        0,
+        153
+      ],
+      [
+        529,
+        1,
+        470
+      ],
+      [
+        283,
+        0,
+        1717
+      ]
+    ],
+    "roc_auc_weighted": 0.8690464751199496
+  },
+  "latency": {
+    "total_ms": 33.13,
+    "per_sample_ms": 0.33,
+    "samples_per_second": 3018.1
+  },
+  "test_classification_report": {
+    "negative": {
+      "precision": 0.6945071482317532,
+      "recall": 0.9234617308654327,
+      "f1-score": 0.7927850547562809,
+      "support": 1999.0
+    },
+    "neutral": {
+      "precision": 1.0,
+      "recall": 0.001,
+      "f1-score": 0.001998001998001998,
+      "support": 1000.0
+    },
+    "positive": {
+      "precision": 0.7337606837606837,
+      "recall": 0.8585,
+      "f1-score": 0.7912442396313364,
+      "support": 2000.0
+    },
+    "accuracy": 0.7129425885177035,
+    "macro avg": {
+      "precision": 0.8094226106641457,
+      "recall": 0.5943205769551443,
+      "f1-score": 0.5286757654618731,
+      "support": 4999.0
+    },
+    "weighted avg": {
+      "precision": 0.7713224958665017,
+      "recall": 0.7129425885177035,
+      "f1-score": 0.6339795570551071,
+      "support": 4999.0
+    }
+  }
+}
