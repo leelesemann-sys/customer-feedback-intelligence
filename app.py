@@ -20,9 +20,18 @@ from config.config import LABEL_NAMES, RESULTS_DIR
 
 
 st.set_page_config(
-    page_title="Customer Feedback Intelligence",
+    page_title="Customer Feedback Intelligence — Sentiment Analysis: BERT vs Classical ML vs LLM",
     page_icon="📊",
     layout="wide",
+    menu_items={
+        "About": (
+            "## Customer Feedback Intelligence\n"
+            "Sentiment analysis benchmark comparing Classical ML, Fine-tuned BERT, "
+            "and GPT-4o on German and English customer feedback.\n\n"
+            "**[GitHub Repository](https://github.com/leelesemann-sys/customer-feedback-intelligence)**"
+        ),
+        "Report a bug": "https://github.com/leelesemann-sys/customer-feedback-intelligence/issues",
+    },
 )
 
 # ---------- Data Loading ----------

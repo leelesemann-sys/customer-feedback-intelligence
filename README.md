@@ -1,13 +1,15 @@
-# Customer Feedback Intelligence
+# Customer Feedback Intelligence — Sentiment Analysis Benchmark
 
 [![CI](https://github.com/leelesemann-sys/customer-feedback-intelligence/actions/workflows/ci.yml/badge.svg)](https://github.com/leelesemann-sys/customer-feedback-intelligence/actions/workflows/ci.yml)
 [![Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://customer-feedback-intelligence.streamlit.app)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-A systematic comparison of three ML approaches for sentiment classification: **Classical ML** (TF-IDF + traditional classifiers), **Fine-tuned BERT**, and **LLM-based** (Azure OpenAI GPT-4o zero/few-shot).
+End-to-end **sentiment analysis** benchmark comparing three ML approaches on customer feedback data: **Classical ML** (TF-IDF + SVM/LogReg/NB), **Fine-tuned BERT** (HuggingFace Transformers), and **LLM zero/few-shot** (Azure OpenAI GPT-4o). Includes training pipelines, evaluation framework, REST API, and interactive dashboard.
 
 Evaluated on two datasets: [German Sentiment](https://huggingface.co/datasets/sepidmnorozy/German_sentiment) (8.7K samples, 3-class) and [Yelp Reviews](https://huggingface.co/datasets/Yelp/yelp_review_full) (650K English reviews, 5-star → 3-class).
 
-> **[Live Dashboard](https://customer-feedback-intelligence.streamlit.app)** | **[GitHub Repo](https://github.com/leelesemann-sys/customer-feedback-intelligence)** — Interactive results explorer with model comparison, error analysis, and live demo.
+> **[Live Dashboard](https://customer-feedback-intelligence.streamlit.app)** | **[GitHub Repo](https://github.com/leelesemann-sys/customer-feedback-intelligence)** — Interactive results explorer with model comparison, confusion matrices, error analysis, and live sentiment classifier.
 
 ## Results
 
