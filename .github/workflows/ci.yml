@@ -21,14 +21,56 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
 
+      - name: Lint with ruff
+        run: |
+          pip install ruff
+          ruff check src/ tests/ app.py run_training.py run_evaluation.py --select E,F,W --ignore E501
+
+      - name: Check formatting with ruff
+        run: ruff format --check src/ tests/ app.py --diff || true
+
+      - name: Type check critical modules
+        run: |
+          mypy src/models/classical.py src/evaluation/metrics.py --ignore-missing-imports --no-error-summary || true
+
       - name: Run tests
         run: pytest tests/ -v --cov=src --cov-report=term-missing
 
       - name: Check imports
-        run: python -c "from src.models.classical import ClassicalSentimentModel; print('OK')"
+        run: |
+          python -c "from src.models.classical import ClassicalSentimentModel; print('Classical OK')"
+          python -c "from src.evaluation.metrics import compute_metrics; print('Metrics OK')"
+          python -c "from src.data.preprocessor import TextPreprocessor; print('Preprocessor OK')"
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install linters
+        run: pip install ruff
+
+      - name: Ruff lint
+        run: ruff check src/ tests/ --select E,F,W --ignore E501 --output-format=github
+
+      - name: Ruff format check
+        run: ruff format --check src/ tests/ || true
