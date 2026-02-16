@@ -52,17 +52,35 @@ class SentimentPredictor:
         labels = self.model.predict(texts)
         probas = self.model.predict_proba(texts)
 
+        # Determine which classes the model actually outputs.
+        # sklearn models trained on non-consecutive labels (e.g. [0, 2])
+        # return probabilities only for classes seen during training.
+        model_classes = None
+        if hasattr(self.model, "pipeline"):
+            model_classes = self.model.pipeline.classes_
+        elif hasattr(self.model, "classes_"):
+            model_classes = self.model.classes_
+
         results = []
         for i, (label, proba) in enumerate(zip(labels, probas)):
+            # Build full probability dict for all LABEL_NAMES
+            if model_classes is not None and len(model_classes) != len(LABEL_NAMES):
+                prob_dict = {name: 0.0 for name in LABEL_NAMES}
+                for cls_idx, p in zip(model_classes, proba):
+                    if int(cls_idx) < len(LABEL_NAMES):
+                        prob_dict[LABEL_NAMES[int(cls_idx)]] = float(p)
+            else:
+                prob_dict = {
+                    name: float(p)
+                    for name, p in zip(LABEL_NAMES, proba)
+                }
+
             results.append({
                 "text": texts[i],
                 "label": int(label),
                 "label_name": LABEL_NAMES[int(label)],
                 "confidence": float(proba.max()),
-                "probabilities": {
-                    name: float(p)
-                    for name, p in zip(LABEL_NAMES, proba)
-                },
+                "probabilities": prob_dict,
             })
 
         return results
