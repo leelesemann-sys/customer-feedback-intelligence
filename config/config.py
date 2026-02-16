@@ -27,7 +27,8 @@ NUM_LABELS = len(LABEL_NAMES)
 # Deliberate design choice following standard sentiment analysis practice
 # (Socher et al., 2013; Zhang et al., 2015). Maps 1-2★ → negative, 3★ → neutral,
 # 4-5★ → positive. Trade-off: 3★ is only ~20% of Yelp data → class imbalance.
-# We chose 3-class for consistency with the German Sentiment dataset (also 3-class).
+# Note: German Sentiment dataset is 2-class (negative/positive); label remapping
+# in loader.py maps HF label 0→0 (negative), HF label 1→2 (positive).
 LABEL_MAP = {1: 0, 2: 0, 3: 1, 4: 2, 5: 2}
 
 # Multi-seed evaluation: seeds for statistical robustness

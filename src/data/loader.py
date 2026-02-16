@@ -90,8 +90,11 @@ def load_german_sentiment(
 ) -> dict[str, pd.DataFrame]:
     """Load German Sentiment dataset from HuggingFace (8.7K total).
 
-    Already has train/val/test splits with 3-class labels.
-    Test set is fixed (1490 samples) — no subsampling needed since it's small.
+    Already has train/val/test splits. The HuggingFace dataset has 2 classes:
+      - Label 0 = negative
+      - Label 1 = positive
+    We remap to our 3-class scheme (negative=0, neutral=1, positive=2)
+    so label 1 → 2. There are no neutral examples in this dataset.
 
     Args:
         max_train_samples: Cap training set size for faster iteration.
@@ -104,10 +107,15 @@ def load_german_sentiment(
 
     ds = load_dataset("sepidmnorozy/German_sentiment")
 
+    # HuggingFace label 0 = negative, label 1 = positive (no neutral class)
+    # Remap to our 3-class scheme: negative=0, positive=2
+    _german_label_map = {0: 0, 1: 2}
+
     splits = {}
     for split_name, hf_split in [("train", "train"), ("val", "validation"), ("test", "test")]:
         df = ds[hf_split].to_pandas()
         df = df.rename(columns={"text": "text", "label": "label"})
+        df["label"] = df["label"].map(_german_label_map)
         df["label_name"] = df["label"].map(lambda x: LABEL_NAMES[x] if x in range(len(LABEL_NAMES)) else "unknown")
 
         # Drop empty
