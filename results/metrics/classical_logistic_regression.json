@@ -1,7 +1,7 @@
 {
   "model": "classical_logistic_regression",
   "train": {
-    "train_duration_s": 1.74,
+    "train_duration_s": 3.52,
     "val_f1_weighted": 0.8662046215617346
   },
   "val": {
@@ -41,9 +41,9 @@
     "roc_auc_weighted": null
   },
   "latency": {
-    "total_ms": 14.03,
-    "per_sample_ms": 0.14,
-    "samples_per_second": 7129.8
+    "total_ms": 18.13,
+    "per_sample_ms": 0.18,
+    "samples_per_second": 5516.0
   },
   "test_classification_report": {
     "negative": {

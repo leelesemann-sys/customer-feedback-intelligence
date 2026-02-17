@@ -511,17 +511,17 @@ embeddings provide more value for morphologically complex languages.
 # ==================== PAGE 5: Live Demo ====================
 elif page == "Live Demo":
     st.title("Live Sentiment Demo")
-    st.markdown("Enter German text to classify with the trained Logistic Regression model (TF-IDF).")
+    st.markdown("Enter German text to classify with the trained SVM model (TF-IDF).")
 
     # Check if model is available
     from pathlib import Path as _Path
-    _model_path = _Path(__file__).parent / "models" / "classical_logistic_regression.joblib"
+    _model_path = _Path(__file__).parent / "models" / "classical_svm.joblib"
     _model_available = _model_path.exists()
 
     if not _model_available:
         st.warning(
             "No trained model found. To enable the live demo, train a model locally:\n\n"
-            "```\npython run_training.py --model classical --classifier logistic_regression --dataset german\n```"
+            "```\npython run_training.py --model classical --classifier svm --dataset german\n```"
         )
 
     text_input = st.text_area(
@@ -535,7 +535,7 @@ elif page == "Live Demo":
             try:
                 from src.inference.predictor import SentimentPredictor
 
-                predictor = SentimentPredictor.from_classical()
+                predictor = SentimentPredictor.from_classical("classical_svm")
                 result = predictor.predict_single(text_input)
 
                 sentiment_colors = {

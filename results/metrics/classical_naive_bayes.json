@@ -1,7 +1,7 @@
 {
   "model": "classical_naive_bayes",
   "train": {
-    "train_duration_s": 0.97,
+    "train_duration_s": 3.04,
     "val_f1_weighted": 0.8281853336513298
   },
   "val": {
@@ -41,9 +41,9 @@
     "roc_auc_weighted": null
   },
   "latency": {
-    "total_ms": 10.23,
-    "per_sample_ms": 0.1,
-    "samples_per_second": 9770.8
+    "total_ms": 23.7,
+    "per_sample_ms": 0.24,
+    "samples_per_second": 4219.4
   },
   "test_classification_report": {
     "negative": {
@@ -53,16 +53,16 @@
       "support": 1277.0
     },
     "neutral": {
-      "precision": 0.75,
-      "recall": 0.014084507042253521,
-      "f1-score": 0.027649769585253458,
-      "support": 213.0
-    },
-    "positive": {
       "precision": 0.0,
       "recall": 0.0,
       "f1-score": 0.0,
       "support": 0.0
+    },
+    "positive": {
+      "precision": 0.75,
+      "recall": 0.014084507042253521,
+      "f1-score": 0.027649769585253458,
+      "support": 213.0
     },
     "accuracy": 0.8583892617449664,
     "macro avg": {
