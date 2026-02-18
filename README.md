@@ -1,5 +1,7 @@
 # Customer Feedback Intelligence — Sentiment Analysis Benchmark
 
+> **Language:** English | [Deutsch](README.de.md)
+
 [![CI](https://github.com/leelesemann-sys/customer-feedback-intelligence/actions/workflows/ci.yml/badge.svg)](https://github.com/leelesemann-sys/customer-feedback-intelligence/actions/workflows/ci.yml)
 [![Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://customer-feedback-intelligence.streamlit.app)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
