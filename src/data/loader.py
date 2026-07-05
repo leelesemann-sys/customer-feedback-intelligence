@@ -16,6 +16,7 @@ import pandas as pd
 from datasets import load_dataset
 from sklearn.model_selection import train_test_split
 
+from src.data.csv_normalizer import normalize_text_dataframe
 from config.config import LABEL_NAMES, RANDOM_SEED
 
 logger = logging.getLogger(__name__)
@@ -140,17 +141,12 @@ def load_from_csv(
 ) -> pd.DataFrame:
     """Load a local CSV file for inference or additional evaluation."""
     df = pd.read_csv(path)
-    df = df.rename(columns={text_col: "text"})
-
-    if label_col in df.columns and label_col != "label":
-        df = df.rename(columns={label_col: "label"})
-
-    if "label" in df.columns:
-        df["label_name"] = df["label"].map(
-            lambda x: LABEL_NAMES[x] if x in range(len(LABEL_NAMES)) else "unknown"
-        )
-
-    return df
+    return normalize_text_dataframe(
+        df,
+        text_col=text_col,
+        label_col=label_col,
+        label_names=LABEL_NAMES,
+    )
 
 
 def get_label_distribution(df: pd.DataFrame) -> dict[str, int]:
